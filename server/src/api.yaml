@@ -1,0 +1,173 @@
+openapi: 3.0.0
+info:
+  title: Cloud File Storage Server
+  description: |
+    **Cloud File Storage Server (CFS-Server)** — это многопользовательское файловое облако, позволяющее пользователям загружать, хранить и управлять своими файлами.
+    Сервис предоставляет REST API для интеграции с клиентскими приложениями.
+    API использует механизм авторизации на основе сессий *Spring Session* (cookie-based authentication), при котором после успешной аутентификации сервер создаёт сессионный cookie (`JSESSIONID`). Этот cookie должен передаваться клиентом в последующих запросах для доступа к ресурсам, требующим авторизации.
+  version: 1.0.0
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: 'http://localhost:8081'
+    description: CFS-Server - localhost
+paths:
+  /api/auth/sign-up:
+    post:
+      summary: Регистрация по логину паролю.
+      tags:
+        - AUTHENTICATION
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 6
+                  maxLength: 128
+                  required: true
+                  example: user_1
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 128
+                  required: true
+                  example: password
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: user_1
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Слишком короткий username
+        '401':
+          description: Неверные данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Логин или пароль введены неверно
+        '500':
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Неизвестная ошибка
+  /api/auth/sign-in:
+    post:
+      summary: Авторизация по логину паролю.
+      tags:
+        - AUTHENTICATION
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                  minLength: 6
+                  maxLength: 128
+                  example: user_1
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 128
+                  example: password
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                properties:
+                  username:
+                    type: string
+                    example: user_1
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: Слишком короткий username
+        '401':
+          description: Неверные данные
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: Логин или пароль введены неверно
+        '500':
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: Неизвестная ошибка
+
+  /api/auth/sign-out:
+    post:
+      summary: Выход из аккаунта (logout)
+      tags:
+        - AUTHENTICATION
+      security:
+        - SessionAuth: []
+      responses:
+        '204':
+          description: Успешная операция
+        '401':
+          description: Пользователь не авторизирован
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: Запрос выполняется неавторизированным пользователем
+        '500':
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: Неизвестная ошибка
+components:
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
