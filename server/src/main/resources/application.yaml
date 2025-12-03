@@ -1,2 +1,8 @@
 server:
   port: 8081
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRESQL_SERVICE_HOST}:${POSTGRESQL_SERVICE_PORT}/${POSTGRESQL_DATABASE}
+    username: ${POSTGRESQL_USER_SERVER}
+    password: ${POSTGRESQL_PASSWORD_SERVER}

@@ -1,9 +1,19 @@
 services:
+  server:
+    build: ./server/
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      POSTGRESQL_SERVICE_HOST: postgres
+      POSTGRESQL_SERVICE_PORT: '5432'
+      POSTGRESQL_DATABASE: ${POSTGRES_DB}
+      POSTGRESQL_USER_SERVER: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD_SERVER: ${POSTGRES_PASSWORD}
   postgres:
-    image: postgres:16
+    image: postgres:16.11
     restart: always
     environment:
-      PGDATA: /data/postgres
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
